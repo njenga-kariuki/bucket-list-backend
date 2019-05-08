@@ -1,0 +1,120 @@
+require 'open-uri'
+require 'mechanize'
+require 'nokogiri'
+class Destination < ApplicationRecord
+  has_many :trips
+  has_many :users, through: :trips
+  accepts_nested_attributes_for :trips
+
+  #get destination value for external lookup
+  def getDestinationValue
+    if self.city
+      return self.city
+    elsif self.state
+      return self.state
+    elsif self.country
+      return self.country
+    else
+      return null
+    end
+  end
+
+  #helper function to format name for scrape
+  def formatName(inputName)
+    outputName = inputName.split(" ").join("_")
+    outputName
+  end
+
+  #scrape annual temp averages from https://www.holiday-weather.com/
+  def fetchAnnualTemps
+    destination = self.getDestinationValue
+    lookup_destination = formatName(destination)
+    if lookup_destination
+      mechanize = Mechanize.new
+      page = mechanize.get("https://www.holiday-weather.com/#{lookup_destination}/averages/")
+      table = page.at('div.averages_table-wrap')
+      temp_data = {}
+      i = 0
+
+      while i < 3
+        table.search('tr').each do |tr|
+        temp_data[i] = tr.text.strip
+        i+=1
+        end
+      end
+
+      final_data = temp_data.map{|key,value|value.gsub(/\n/,",")}
+      final_data[2]
+    else
+      return null
+    end
+  end
+
+
+  # scrape top hotels from Hotels.com
+  def fetchHotelData
+    destination = self.getDestinationValue
+    mechanize = Mechanize.new
+    page = mechanize.get("https://www.hotels.com/")
+    form = page.form
+
+    #input trip information into form
+    form['q-destination'] = destination
+    form['q-localised-check-in'] = '09-15-2019'
+    form['q-localised-check-out'] = '09-22-2019'
+    form['q-room-0-adults'] = 1
+
+    page2 = form.submit
+
+    newurl = page2.uri.to_s + "&f-star-rating=5,4&f-guest-rating-min=7&sort-order=STAR_RATING_HIGHEST_FIRST"
+
+    page3 = mechanize.get(newurl)
+
+    hotel_list = page3.at('.listings')
+
+    hotel_name_arr = {}
+
+    hotel_list.search('li').each do |hotel|
+      if hotel.at('a.property-name-link')
+        hotel_details =  hotel.at('a.property-name-link').inner_text
+        hotel_link = 'www.hotels.com' + hotel.at('a.property-name-link').attr('href')
+        hotel_name_arr[hotel_details] = [hotel_link]
+      end
+      if hotel.at('aside')
+        if hotel.at('div.price')
+          hotel_price =  hotel.at('a.price-link').inner_text
+          hotel_name_arr[hotel_details].push(hotel_price)
+        end
+      end
+    end
+    hotel_name_arr
+  end
+
+  #takes in argument and returns  top search links from google (page 1)
+  def fetchTopGoogleSearchResults
+    destination = self.getDestinationValue
+    lookupOptions = ['restaurants', 'golf_courses', 'hikes', 'tourist_sites']
+    topLinks = {}
+
+    mechanize = Mechanize.new
+    page = mechanize.get("https://www.google.com/")
+    form = page.form
+
+    lookupOptions.each do |activity|
+      topLinks[activity] = []
+      page = mechanize.get("https://www.google.com/")
+      form = page.form
+      form['q'] = "best #{activity} in #{destination}"
+      page2 = form.submit
+
+      page2.links.each do |url|
+        if (url.href.include?('/url') && !url.href.include?('webcache'))
+          cleanURL = url.href.split('&sa')[0][7..-1]
+          topLinks[activity].push(cleanURL)
+        end
+      end
+    end
+   topLinks
+  end
+
+end
