@@ -27,6 +27,9 @@ gem 'rack-cors'
 gem 'mechanize'
 gem 'nokogiri'
 gem 'dotenv-rails'
+gem 'whenever'
+gem 'rake'
+gem 'activesupport'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
