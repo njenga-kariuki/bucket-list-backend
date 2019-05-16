@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190501222629) do
+ActiveRecord::Schema.define(version: 20190515182513) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,6 +44,9 @@ ActiveRecord::Schema.define(version: 20190501222629) do
     t.string "preffered_airline_2"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "password_digest"
+    t.string "preffered_hotel_2"
+    t.string "preffered_airline_1"
   end
 
 end
