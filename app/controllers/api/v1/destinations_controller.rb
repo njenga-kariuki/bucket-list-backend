@@ -1,14 +1,17 @@
 class Api::V1::DestinationsController < ApplicationController
 
-  #CREATE -- no if logic to check if destination exists yet
   def create
-    @destination = Destination.new(destination_params)
 
-    if @destination.save
+    if Destination.find_by(city: destination_params[:city], country: destination_params[:country])
+      @destination = Destination.find_by(city: destination_params[:city], country: destination_params[:country])
+      @destination.trips.build(destination_params[:trips_attributes])
       render json: @destination, status: :accepted
     else
-      render json: {errors: @destination.errors.full_messages}, status: :unproccessible_entity
+      @destination = Destination.create(destination_params)
+      render json: @destination, status: :accepted
     end
+    @destination.avg_monthly_temperature = @destination.fetchAnnualTemps
+    @destination.save
   end
 
   def destination_params

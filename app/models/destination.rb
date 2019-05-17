@@ -19,7 +19,7 @@ class Destination < ApplicationRecord
     end
   end
 
-  #helper function to format name for scrape
+  #helper to format name for scrape
   def formatName(inputName)
     outputName = inputName.split(" ").join("_")
     outputName
@@ -50,7 +50,6 @@ class Destination < ApplicationRecord
     end
   end
 
-
   # scrape top hotels from Hotels.com
   def fetchHotelData
     destination = self.getDestinationValue
@@ -58,7 +57,6 @@ class Destination < ApplicationRecord
     page = mechanize.get("https://www.hotels.com/")
     form = page.form
 
-    #input trip information into form
     form['q-destination'] = destination
     form['q-localised-check-in'] = '09-15-2019'
     form['q-localised-check-out'] = '09-22-2019'
@@ -93,7 +91,7 @@ class Destination < ApplicationRecord
   #takes in argument and returns  top search links from google (page 1)
   def fetchTopGoogleSearchResults
     destination = self.getDestinationValue
-    lookupOptions = ['restaurants', 'golf_courses', 'hikes', 'tourist_sites']
+    lookupOptions = ['restaurants','tourist_sites']
     topLinks = {}
 
     mechanize = Mechanize.new
