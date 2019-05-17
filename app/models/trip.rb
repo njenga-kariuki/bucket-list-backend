@@ -2,7 +2,7 @@ class Trip < ApplicationRecord
   belongs_to :user
   belongs_to :destination
 
-  ##function to iterate over each trip and create an object with the destination details
+  ##iterate over each trip and create an object with the destination details
   def get_trip_details
     temps = self.destination.fetchAnnualTemps
 
