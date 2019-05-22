@@ -9,6 +9,8 @@ class TripSerializer < ActiveModel::Serializer
       state: self.object.destination.state,
       country: self.object.destination.country,
       postal_code: self.object.destination.postal_code,
+      latitude: self.object.destination.latitude,
+      longitude: self.object.destination.longitude,
       avg_monthly_temperature: self.object.destination.avg_monthly_temperature,
       hotel_data: self.object.destination.fetchHotelData,
       activity_data: self.object.destination.fetchTopGoogleSearchResults

@@ -22,6 +22,8 @@ class Api::V1::DestinationsController < ApplicationController
     :state,
     :country,
     :postal_code,
+    :latitude,
+    :longitude,
     trips_attributes:[:trip_start,:trip_end,:user_id]
     )
   end
