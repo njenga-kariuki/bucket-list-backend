@@ -10,6 +10,12 @@ class Api::V1::TripsController < ApplicationController
     render json: @hotel_data, status: :accepted
   end
 
+
+  def trip_details
+    @trip = Trip.find(params[:id])
+    render json: {trip: TripOverviewSerializer.new(@trip)}
+  end
+
   def activity_data
     @activity_data = Trip.get_activity_data
     render json: @activity_data, status: :accepted
