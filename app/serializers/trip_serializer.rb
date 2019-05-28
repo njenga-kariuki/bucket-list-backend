@@ -11,6 +11,4 @@ class TripSerializer < ActiveModel::Serializer
       postal_code: self.object.destination.postal_code
     }
   end
-
-
 end

@@ -1,5 +1,5 @@
 class TripOverviewSerializer < ActiveModel::Serializer
-  attributes :id, :trip_start, :trip_end, :destination_data
+  attributes :id, :trip_start, :trip_end, :flight_summary, :destination_data
   has_one :user
 
   def destination_data
@@ -16,7 +16,14 @@ class TripOverviewSerializer < ActiveModel::Serializer
       activity_data: self.object.destination.fetchTopGoogleSearchResults
     }
   end
+
+  def flight_summary
+    {
+      flight_distance: self.object.flight_distance,
+      flight_time: self.object.flight_time,
+      time_zone_difference: self.object.time_zone_difference,
+      nearby_airports: self.object.nearby_airports,
+      direct_flights: self.object.direct_flights
+    }
+  end
 end
-
-
-##############MAY NOT NEED THIS
