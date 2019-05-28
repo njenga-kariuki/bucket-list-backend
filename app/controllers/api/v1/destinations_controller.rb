@@ -1,7 +1,6 @@
 class Api::V1::DestinationsController < ApplicationController
 
   def create
-
     if Destination.find_by(city: destination_params[:city], country: destination_params[:country])
       @destination = Destination.find_by(city: destination_params[:city], country: destination_params[:country])
       @destination.trips.build(destination_params[:trips_attributes])
