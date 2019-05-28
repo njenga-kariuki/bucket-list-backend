@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190522203109) do
+ActiveRecord::Schema.define(version: 20190528213132) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,12 @@ ActiveRecord::Schema.define(version: 20190522203109) do
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "departure_location"
+    t.string "nearby_airports", default: [], array: true
+    t.string "flight_distance"
+    t.string "flight_time"
+    t.string "time_zone_difference"
+    t.string "direct_flights", default: [], array: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -50,6 +56,8 @@ ActiveRecord::Schema.define(version: 20190522203109) do
     t.string "password_digest"
     t.string "preffered_hotel_2"
     t.string "preffered_airline_1"
+    t.string "default_airport_code"
+    t.string "default_departure_city"
   end
 
 end

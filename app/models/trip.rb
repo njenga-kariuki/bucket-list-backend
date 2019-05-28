@@ -1,50 +1,41 @@
 class Trip < ApplicationRecord
   belongs_to :user
   belongs_to :destination
+  after_create :get_flight_summary
 
-  ##iterate over each trip and create an object with the destination details
-  def get_trip_details
-    temps = self.destination.fetchAnnualTemps
+  #scrapes flight summary info from travelmath.com and saves to db as array
+  def get_flight_summary
+    flight_info = [{}]
+    departure_city = self.departure_location || self.user.default_departure_city
 
-    trip_detail = {
-      trip_id: self.id,
-      trip_start: self.trip_start,
-      trip_end: self.trip_end,
-      destination: {
-        street_number: self.destination.street_number,
-        street_name: self.destination.street_name,
-        city: self.destination.city,
-        state: self.destination.state,
-        country: self.destination.country,
-        postal_code: self.destination.postal_code,
-        avg_monthly_temperature: temps
-      }
-    }
-    trip_detail
-  end
+    departure_city.split(" ").length > 1 ? url_departure = departure_city.split(" ").join("+,") : url_departure = departure_city
 
-  ##calls trip details on all trips
-  def self.get_all_trip_details
-    trips = []
-    Trip.all.map{|trip|trips.push(trip.get_trip_details)}
-    return trips
-  end
+    url_arrival =   self.destination.getDestinationValue.split(" ").join("+,")
 
-  #retreives top hotels from hotels.com based on specific parameters
-  def self.get_hotel_data
-    trips_hotel_data = []
-    Trip.all.map do |trip|
-      trips_hotel_data.push(trip.destination.fetchHotelData)
+    mechanize = Mechanize.new
+
+    page = mechanize.get("https://www.travelmath.com/from/#{url_departure}/to/#{url_arrival}")
+
+    ##get table with flight information
+    data_table = page.search('table')[1]
+
+    data_table.search('tr').slice(0,6).each do |tr|
+        cells = tr.search('th, td')
+        flight_info[0][cells[0].text] = cells[1].text unless cells[0].text == "Book a Flight"
     end
-    trips_hotel_data
-  end
 
-  def self.get_activity_data
-    trips_activity_data = []
-    Trip.all.map do |trip|
-      trips_activity_data.push(trip.destination.fetchTopGoogleSearchResults)
-    end
-    trips_activity_data
+    #formulate nearby airport a nested array
+    flight_info[0]["Airports near Destination"] = flight_info[0]["Airports near Destination"].split("\n") unless !flight_info[0]["Airports near Destination"]
+
+    #formulate nearby airport a nested array
+    flight_info[0]["Direct Flights"] = flight_info[0]["Direct Flights"].split("\n") unless !flight_info[0]["Direct Flights"]
+
+    self.flight_distance = flight_info[0]["Flight Distance"] || nil
+    self.flight_time = flight_info[0]["Flight Time"] || nil
+    self.time_zone_difference = flight_info[0]["Time Difference"] || nil
+    self.nearby_airports= flight_info[0]["Airports near Destination"] || nil
+    self.direct_flights = flight_info[0]["Direct Flights"] || nil
+    self.save
   end
 
 end
