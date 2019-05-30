@@ -1,6 +1,7 @@
 class Trip < ApplicationRecord
   belongs_to :user
   belongs_to :destination
+  has_many :trip_notes
   after_create :get_flight_summary
 
   #scrapes flight summary info from travelmath.com and saves to db as array
@@ -10,7 +11,7 @@ class Trip < ApplicationRecord
 
     departure_city.split(" ").length > 1 ? url_departure = departure_city.split(" ").join("+,") : url_departure = departure_city
 
-    url_arrival =   self.destination.getDestinationValue.split(" ").join("+,")
+    url_arrival = self.destination.getCombinedDestinationValue.split(" ").join("+,")
 
     mechanize = Mechanize.new
 

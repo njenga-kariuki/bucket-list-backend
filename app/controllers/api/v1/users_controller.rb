@@ -26,7 +26,12 @@ class Api::V1::UsersController < ApplicationController
       :preffered_hotel_1,
       :preffered_hotel_2,
       :preffered_airline_1,
-      :preffered_airline_2)
+      :preffered_airline_2,
+      :default_airport_code,
+      :default_departure_city,
+      :preferred_activities => [],
+      :preferred_accomodations => []
+    )
   end
 
 end
