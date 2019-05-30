@@ -6,7 +6,7 @@ class Destination < ApplicationRecord
   has_many :users, through: :trips
   accepts_nested_attributes_for :trips
 
-  #get destination value for external lookup
+  #get a single destination value for external lookup
   def getDestinationValue
     if self.city
       return self.city
@@ -16,6 +16,20 @@ class Destination < ApplicationRecord
       return self.country
     else
       return null
+    end
+  end
+
+  ##get a combined destination lookup value (e.g., city+state)
+
+  def getCombinedDestinationValue
+    if self.city
+      lookup_city = self.city.split(" ").join("+")
+      return "#{lookup_city} #{(self.country)}"
+    elsif self.state
+      lookup_state = self.state.split(" ").join("+")
+      return "#{lookup_state} #{self.country}"
+    elsif self.country
+      return self.country
     end
   end
 
@@ -89,28 +103,35 @@ class Destination < ApplicationRecord
   end
 
   #takes in argument and returns  top search links from google (page 1)
-  def fetchTopGoogleSearchResults
+  def fetchTopGoogleSearchResults(userId)
+    user_activities = User.find(userId).preferred_activities
+
+    if user_activities.length < 1
+      lookup_activities = ['Restaurants','Tourist Sites', 'Bars', 'Golf Courses']
+    else
+      lookup_activities = user_activities
+    end
+
     destination = self.getDestinationValue
-    lookupOptions = ['restaurants','tourist_sites']
     topLinks = {}
 
     mechanize = Mechanize.new
     page = mechanize.get("https://www.google.com/")
     form = page.form
 
-    lookupOptions.each do |activity|
+    lookup_activities.each do |activity|
       topLinks[activity] = []
       page = mechanize.get("https://www.google.com/")
       form = page.form
       form['q'] = "best #{activity} in #{destination}"
       page2 = form.submit
 
-      page2.links.each do |url|
-        if (url.href.include?('/url') && !url.href.include?('webcache'))
-          cleanURL = url.href.split('&sa')[0][7..-1]
-          topLinks[activity].push(cleanURL)
-        end
+    page2.links.each do |url|
+      if (url.href.include?('/url') && !url.href.include?('webcache'))
+        cleanURL = url.href.split('&sa')[0][7..-1]
+        topLinks[activity].push(cleanURL)
       end
+    end
     end
    topLinks
   end
