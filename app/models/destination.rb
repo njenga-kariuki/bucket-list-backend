@@ -126,14 +126,27 @@ class Destination < ApplicationRecord
       form['q'] = "best #{activity} in #{destination}"
       page2 = form.submit
 
-    page2.links.each do |url|
-      if (url.href.include?('/url') && !url.href.include?('webcache'))
-        cleanURL = url.href.split('&sa')[0][7..-1]
-        topLinks[activity].push(cleanURL)
+      i = 0
+
+      page2.links.each do |url|
+        if i < 5
+          begin
+            if (url.href.include?('/url') && !url.href.include?('webcache') && !url.href.include?("accounts.google.com"))
+              cleanURL = url.href.split('&sa')[0][7..-1]
+              testPageClick = mechanize.get(cleanURL)
+              testPageTitle = testPageClick.title
+              obj = {}
+              obj[testPageTitle] = cleanURL
+              topLinks[activity].push(obj)
+              i+=1
+            end
+          rescue Mechanize::ResponseCodeError => e
+            test = e.response_code
+          end
+        end
       end
     end
-    end
-   topLinks
+    topLinks
   end
 
 end
