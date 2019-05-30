@@ -16,6 +16,11 @@ class Api::V1::TripsController < ApplicationController
     render json: {trip: TripOverviewSerializer.new(@trip)}
   end
 
+  def trip_activity_data
+    @trip = Trip.find(params[:id])
+    render json: {trip: ActivityGoogleResultsSerializer.new(@trip)}
+  end
+
   def activity_data
     @activity_data = Trip.get_activity_data
     render json: @activity_data, status: :accepted
