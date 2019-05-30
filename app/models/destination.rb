@@ -24,7 +24,7 @@ class Destination < ApplicationRecord
   def getCombinedDestinationValue
     if self.city
       lookup_city = self.city.split(" ").join("+")
-      return "#{lookup_city} #{(self.country)}"
+      return "#{lookup_city} #{(self.state || self.country)}"
     elsif self.state
       lookup_state = self.state.split(" ").join("+")
       return "#{lookup_state} #{self.country}"
