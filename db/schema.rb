@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190530002740) do
+ActiveRecord::Schema.define(version: 20190530172618) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -50,6 +50,8 @@ ActiveRecord::Schema.define(version: 20190530002740) do
     t.string "flight_time"
     t.string "time_zone_difference"
     t.string "direct_flights", default: [], array: true
+    t.string "departure_airport_code"
+    t.integer "number_travelers"
   end
 
   create_table "users", force: :cascade do |t|
