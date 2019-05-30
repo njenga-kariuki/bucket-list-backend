@@ -107,7 +107,7 @@ class Destination < ApplicationRecord
     user_activities = User.find(userId).preferred_activities
 
     if user_activities.length < 1
-      lookup_activities = ['Restaurants','Tourist Sites', 'Bars', 'Golf Courses']
+      lookup_activities = ['Restaurants','Tourist Sites', 'Bars', 'Golf Courses', 'Hikes']
     else
       lookup_activities = user_activities
     end

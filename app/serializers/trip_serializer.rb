@@ -1,6 +1,7 @@
 class TripSerializer < ActiveModel::Serializer
   attributes :id, :trip_start, :trip_end, :destination_data
-  
+  has_one :user
+
   def destination_data
     {
       street_number: self.object.destination.street_number,
