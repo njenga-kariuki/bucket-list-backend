@@ -23,7 +23,14 @@ class Api::V1::DestinationsController < ApplicationController
     :postal_code,
     :latitude,
     :longitude,
-    trips_attributes:[:trip_start,:trip_end,:user_id]
+    trips_attributes:[
+      :trip_start,
+      :trip_end,
+      :user_id,
+      :departure_location,
+      :departure_airport_code,
+      :number_travelers
+      ]
     )
   end
 end
