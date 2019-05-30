@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       post '/login', to: 'auth#create'
       get '/profile', to: 'users#profile'
       get 'users/:id/trip_details/:id', to: 'trips#trip_details'
+      post 'users/:id/trip_details/:id/trip_notes', to: 'trip_notes#create'
       resources :destinations, only: [:new, :create, :index, :update, :delete]
       resources :trips, only: [:new, :create, :index, :update, :delete]
       get '/trips/hotel_data', :to => 'trips#hotel_data'
