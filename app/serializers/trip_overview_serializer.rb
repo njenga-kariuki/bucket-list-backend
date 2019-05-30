@@ -12,8 +12,7 @@ class TripOverviewSerializer < ActiveModel::Serializer
       latitude: self.object.destination.latitude,
       longitude: self.object.destination.longitude,
       avg_monthly_temperature: self.object.destination.avg_monthly_temperature,
-      hotel_data: self.object.destination.fetchHotelData,
-      activity_data: self.object.destination.fetchTopGoogleSearchResults(self.object.user.id)
+      hotel_data: self.object.destination.fetchHotelData
     }
   end
 
